@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercice Facture – Bureau d'Études TERRATEC</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f3ee;
+    --rule: #c8c2b4;
+    --accent: #c0392b;
+    --success: #27ae60;
+    --error: #e74c3c;
+    --warning: #f39c12;
+    --grey: #6b6b6b;
+    --light-grey: #e8e4dc;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #2c2c3a; font-family: var(--sans); color: var(--ink); min-height: 100vh; padding: 24px 16px 60px; }
+
+  .page-header { text-align: center; margin-bottom: 28px; }
+  .page-header h1 { font-family: var(--mono); font-size: 11px; letter-spacing: 4px; color: #aaa; text-transform: uppercase; margin-bottom: 6px; }
+  .page-header .subject { font-size: 13px; color: #888; font-style: italic; }
+
+  .progress-bar-wrapper { max-width: 900px; margin: 0 auto 20px; }
+  .progress-info { display: flex; justify-content: space-between; font-size: 11px; color: #999; margin-bottom: 6px; font-family: var(--mono); }
+  .progress-track { height: 4px; background: #444; border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #e67e22); border-radius: 2px; transition: width 0.5s ease; width: 0%; }
+
+  .enonce-wrapper { max-width: 900px; margin: 0 auto 32px; background: #1e1e2e; border-left: 3px solid var(--accent); border-radius: 4px; padding: 22px 28px; color: #ddd; }
+  .enonce-wrapper h2 { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 14px; }
+  .enonce-wrapper p { font-size: 13.5px; line-height: 1.75; margin-bottom: 10px; font-weight: 300; }
+  .enonce-wrapper p strong { color: #fff; font-weight: 600; }
+  .enonce-wrapper ul { margin: 8px 0 10px 20px; font-size: 13px; line-height: 1.8; color: #ccc; }
+  .enonce-wrapper .consigne { margin-top: 16px; padding: 12px 16px; background: rgba(192,57,43,0.15); border-radius: 3px; font-size: 13px; color: #f0c0bb; font-style: italic; }
+
+  .facture-wrapper { max-width: 900px; margin: 0 auto; background: var(--paper); box-shadow: 0 20px 60px rgba(0,0,0,0.5); border-radius: 2px; }
+
+  .facture-header { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid var(--ink); }
+  .company-block { padding: 28px 28px 20px; border-right: 1px solid var(--rule); }
+  .company-logo { font-family: var(--mono); font-size: 22px; font-weight: 600; letter-spacing: -1px; color: var(--ink); margin-bottom: 4px; }
+  .company-logo span { color: var(--accent); }
+  .company-tagline { font-size: 10px; letter-spacing: 2px; color: var(--grey); text-transform: uppercase; margin-bottom: 14px; }
+  .company-info { font-size: 11.5px; color: var(--grey); line-height: 1.7; font-weight: 300; }
+  .facture-meta { padding: 28px 28px 20px; }
+  .facture-title { font-family: var(--mono); font-size: 18px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  .meta-grid { display: grid; grid-template-columns: 120px 1fr; gap: 5px 8px; }
+  .meta-label { color: var(--grey); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 10.5px; align-self: center; }
+  .meta-val { font-family: var(--mono); font-size: 12px; color: var(--ink); }
+
+  .client-section { display: grid; grid-template-columns: 1fr 1fr; padding: 18px 28px; background: var(--light-grey); border-bottom: 1px solid var(--rule); gap: 16px; }
+  .section-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--grey); margin-bottom: 8px; font-weight: 600; }
+  .client-info { font-size: 12.5px; line-height: 1.7; color: var(--ink); }
+  .client-info strong { font-weight: 700; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead tr { background: var(--ink); color: var(--paper); }
+  thead th { padding: 10px 14px; text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
+  thead th.right { text-align: right; }
+  thead th.center { text-align: center; }
+  tbody tr { border-bottom: 1px solid var(--rule); }
+  tbody tr:nth-child(even) { background: rgba(0,0,0,0.025); }
+  td { padding: 11px 14px; vertical-align: middle; }
+  td.ref { font-family: var(--mono); font-size: 11px; color: var(--grey); }
+  td.desc .sub { font-size: 11px; color: var(--grey); font-style: italic; }
+  td.right { text-align: right; }
+  td.center { text-align: center; }
+
+  .inp {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid var(--rule);
+    background: transparent;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink);
+    text-align: right;
+    padding: 4px 2px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .inp:focus { border-bottom-color: var(--accent); background: rgba(192,57,43,0.06); }
+  .inp.correct { border-bottom-color: var(--success) !important; background: rgba(39,174,96,0.12) !important; color: var(--success) !important; font-weight: 600; }
+  .inp.wrong { border-bottom-color: var(--error) !important; background: rgba(231,76,60,0.1) !important; animation: shake 0.35s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+
+  .recap-section { display: grid; grid-template-columns: 1fr 320px; border-top: 2px solid var(--ink); }
+  .conditions { padding: 20px 28px; border-right: 1px solid var(--rule); font-size: 11.5px; color: var(--grey); line-height: 1.7; }
+  .conditions strong { color: var(--ink); font-weight: 600; }
+  .totaux { padding: 16px 20px; }
+  .total-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+  .total-row:last-child { border-bottom: none; }
+  .total-row.ttc { margin-top: 6px; padding-top: 10px; border-top: 2px solid var(--ink); border-bottom: none; font-weight: 700; }
+  .t-label { color: var(--grey); font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; white-space: nowrap; margin-right: 10px; }
+  .total-row.ttc .t-label { color: var(--ink); font-size: 13px; }
+
+  .facture-footer { padding: 14px 28px; background: var(--ink); color: var(--paper); display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; font-family: var(--mono); }
+  .facture-footer .siret { color: #888; }
+
+  .btn-check { display: block; max-width: 900px; margin: 20px auto 0; padding: 14px 24px; background: var(--accent); color: white; border: none; border-radius: 3px; font-family: var(--mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.2s; width: 100%; }
+  .btn-check:hover { background: #a93226; }
+
+  .score-card { max-width: 900px; margin: 20px auto 0; background: #1e1e2e; border-radius: 4px; padding: 24px 28px; display: none; color: #ddd; font-size: 13px; text-align: center; }
+  .score-card.visible { display: block; }
+  .score-card .score-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: #888; text-transform: uppercase; margin-bottom: 8px; }
+  .score-card .big-score { font-family: var(--mono); font-size: 52px; font-weight: 600; margin-bottom: 8px; }
+  .score-card .big-score.good { color: var(--success); }
+  .score-card .big-score.medium { color: var(--warning); }
+  .score-card .big-score.bad { color: var(--error); }
+  .score-card .score-msg { color: #aaa; font-size: 13px; }
+
+  .detail-card { max-width: 900px; margin: 12px auto 0; background: #1e1e2e; border-radius: 4px; padding: 18px 24px; display: none; }
+  .detail-card.visible { display: block; }
+  .detail-card h3 { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: #666; text-transform: uppercase; margin-bottom: 14px; }
+  .detail-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a3a; font-size: 12px; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-nom { color: #ccc; }
+  .detail-saisi { font-family: var(--mono); color: #888; font-size: 11px; }
+  .detail-ok { color: var(--success); font-weight: 700; font-family: var(--mono); }
+  .detail-err { color: var(--error); font-weight: 700; font-family: var(--mono); }
+  .detail-vide { color: #555; font-family: var(--mono); }
+
+  @media (max-width: 640px) {
+    .facture-header, .client-section, .recap-section { grid-template-columns: 1fr; }
+    .company-block { border-right: none; border-bottom: 1px solid var(--rule); }
+    .conditions { border-right: none; border-bottom: 1px solid var(--rule); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Calculs Commerciaux – Bac Pro Bureau d'Études</h1>
+  <p class="subject">Classe de Première &nbsp;·&nbsp; Exercice Facture</p>
+</div>
+
+<div class="progress-bar-wrapper">
+  <div class="progress-info">
+    <span>Avancement</span>
+    <span id="prog-text">0 / 10 cases correctes</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="prog-fill"></div>
+  </div>
+</div>
+
+<div class="enonce-wrapper">
+  <h2>Mise en situation</h2>
+  <p>L'entreprise <strong>TERRATEC Ingénierie</strong> (bureau d'études spécialisé en VRD – Voirie et Réseaux Divers) a réalisé une mission de maîtrise d'œuvre pour le compte de la commune de <strong>Saint-Bonnet-le-Château</strong>.</p>
+  <p>Le chargé d'affaires vous remet les informations suivantes pour établir la facture finale :</p>
+  <ul>
+    <li>Étude topographique et levé de terrain : <strong>14 h</strong> à <strong>65,00 €/h</strong></li>
+    <li>Mission d'ingénierie hydraulique (forfait) : <strong>2 200,00 €</strong></li>
+    <li>Relevé de réseau et modélisation SIG : <strong>8 h</strong> à <strong>72,00 €/h</strong></li>
+    <li>Frais de déplacement (3 déplacements) : <strong>85,00 €/dépl.</strong></li>
+    <li>Location matériel de mesure (GPS RTK) : <strong>180,00 €</strong></li>
+  </ul>
+  <p style="margin-top:10px">Conditions commerciales : <strong>remise de 5 %</strong> sur les prestations de main-d'œuvre uniquement (étude topographique + relevé SIG). Les autres lignes ne bénéficient d'aucune remise. Taux de TVA applicable : <strong>20 %</strong>.</p>
+  <div class="consigne">✏️ Faites les calculs sur votre brouillon, puis saisissez chaque résultat dans la case correspondante. Cliquez sur « Vérifier » pour voir case par case ce qui est juste ou faux. En cas d'erreur, recommencez – la bonne réponse ne sera pas affichée.</div>
+</div>
+
+<div class="facture-wrapper">
+
+  <div class="facture-header">
+    <div class="company-block">
+      <div class="company-logo">TERRA<span>TEC</span></div>
+      <div class="company-tagline">Ingénierie &amp; Bureau d'Études VRD</div>
+      <div class="company-info">
+        12 rue des Platanes – ZAC du Soleil<br>
+        42 000 Saint-Étienne<br>
+        Tél. 04 77 XX XX XX<br>
+        contact@terratec-ingenierie.fr<br>
+        www.terratec-ingenierie.fr
+      </div>
+    </div>
+    <div class="facture-meta">
+      <div class="facture-title">Facture</div>
+      <div class="meta-grid">
+        <span class="meta-label">N° Facture</span><span class="meta-val">2024-0318</span>
+        <span class="meta-label">Date</span><span class="meta-val">15/11/2024</span>
+        <span class="meta-label">Échéance</span><span class="meta-val">15/12/2024</span>
+        <span class="meta-label">Réf. Affaire</span><span class="meta-val">AFF-2024-SBC-07</span>
+        <span class="meta-label">Chargé aff.</span><span class="meta-val">M. Fontaine</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="client-section">
+    <div>
+      <div class="section-label">Émetteur</div>
+      <div class="client-info">
+        <strong>TERRATEC Ingénierie SAS</strong><br>
+        SIRET : 452 879 301 00027<br>
+        TVA intra. : FR 45 452879301<br>
+        APE : 7112B
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Client</div>
+      <div class="client-info">
+        <strong>Mairie de Saint-Bonnet-le-Château</strong><br>
+        Service Technique Municipal<br>
+        Place de l'Hôtel de Ville<br>
+        42 380 Saint-Bonnet-le-Château<br>
+        Réf. commande : BC-2024-122
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:90px">Réf.</th>
+        <th>Désignation</th>
+        <th class="center" style="width:65px">Qté</th>
+        <th class="right" style="width:85px">P.U. HT (€)</th>
+        <th class="right" style="width:100px">Total brut HT</th>
+        <th class="center" style="width:60px">Remise</th>
+        <th class="right" style="width:110px">Total net HT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="ref">TOPO-001</td>
+        <td class="desc">Étude topographique et levé de terrain<div class="sub">Prestation main-d'œuvre – taux horaire</div></td>
+        <td class="center" style="font-family:var(--mono)">14 h</td>
+        <td class="right" style="font-family:var(--mono)">65,00</td>
+        <td class="right"><input class="inp" id="q1" type="text" placeholder="_ _ _,_ _" autocomplete="off" data-answer="910" data-tol="0.5" data-label="Ligne 1 – Total brut HT"></td>
+        <td class="center" style="font-size:11px;color:var(--grey)">5 %</td>
+        <td class="right"><input class="inp" id="q2" type="text" placeholder="_ _ _,_ _" autocomplete="off" data-answer="864.5" data-tol="0.5" data-label="Ligne 1 – Total net HT"></td>
+      </tr>
+      <tr>
+        <td class="ref">ING-002</td>
+        <td class="desc">Mission d'ingénierie hydraulique<div class="sub">Forfait – pas de remise applicable</div></td>
+        <td class="center" style="font-family:var(--mono)">1 forf.</td>
+        <td class="right" style="font-family:var(--mono)">2 200,00</td>
+        <td class="right" style="font-family:var(--mono);color:var(--grey)">2 200,00</td>
+        <td class="center" style="font-size:11px;color:var(--grey)">–</td>
+        <td class="right" style="font-family:var(--mono);color:var(--grey)">2 200,00</td>
+      </tr>
+      <tr>
+        <td class="ref">SIG-003</td>
+        <td class="desc">Relevé de réseau et modélisation SIG<div class="sub">Prestation main-d'œuvre – taux horaire</div></td>
+        <td class="center" style="font-family:var(--mono)">8 h</td>
+        <td class="right" style="font-family:var(--mono)">72,00</td>
+        <td class="right"><input class="inp" id="q3" type="text" placeholder="_ _ _,_ _" autocomplete="off" data-answer="576" data-tol="0.5" data-label="Ligne 3 – Total brut HT"></td>
+        <td class="center" style="font-size:11px;color:var(--grey)">5 %</td>
+        <td class="right"><input class="inp" id="q4" type="text" placeholder="_ _ _,_ _" autocomplete="off" data-answer="547.2" data-tol="0.5" data-label="Ligne 3 – Total net HT"></td>
+      </tr>
+      <tr>
+        <td class="ref">DEP-004</td>
+        <td class="desc">Frais de déplacement<div class="sub">3 déplacements × 85,00 € – pas de remise</div></td>
+        <td class="center" style="font-family:var(--mono)">3</td>
+        <td class="right" style="font-family:var(--mono)">85,00</td>
+        <td class="right"><input class="inp" id="q5" type="text" placeholder="_ _ _,_ _" autocomplete="off" data-answer="255" data-tol="0.5" data-label="Ligne 4 – Total brut HT"></td>
+        <td class="center" style="font-size:11px;color:var(--grey)">–</td>
+        <td class="right" style="font-family:var(--mono);color:var(--grey)">255,00</td>
+      </tr>
+      <tr>
+        <td class="ref">MAT-005</td>
+        <td class="desc">Location matériel de mesure (GPS RTK)<div class="sub">Forfait location – pas de remise</div></td>
+        <td class="center" style="font-family:var(--mono)">1 forf.</td>
+        <td class="right" style="font-family:var(--mono)">180,00</td>
+        <td class="right" style="font-family:var(--mono);color:var(--grey)">180,00</td>
+        <td class="center" style="font-size:11px;color:var(--grey)">–</td>
+        <td class="right" style="font-family:var(--mono);color:var(--grey)">180,00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="recap-section">
+    <div class="conditions">
+      <strong>Conditions de règlement :</strong><br>
+      Virement bancaire à 30 jours date de facture.<br>
+      IBAN : FR76 1234 5678 9012 3456 7890 123<br>
+      BIC : AGRIFRPP842<br><br>
+      <strong>Mentions légales :</strong><br>
+      En cas de retard de paiement, des pénalités de 3 fois le taux légal seront appliquées, ainsi qu'une indemnité forfaitaire de recouvrement de 40 €.<br><br>
+      <strong>Objet :</strong><br>
+      Mission MOE partielle – voirie communale et réseau pluvial.<br>
+      Commune : Saint-Bonnet-le-Château (42)<br>
+      Réf. marché : 2024-MOE-042
+    </div>
+    <div class="totaux">
+      <div class="total-row">
+        <span class="t-label">Total brut HT</span>
+        <input class="inp" id="q6" type="text" placeholder="_ ___,__" autocomplete="off" data-answer="4121" data-tol="0.5" data-label="Total brut HT" style="width:115px">
+      </div>
+      <div class="total-row">
+        <span class="t-label">Total remise HT</span>
+        <input class="inp" id="q7" type="text" placeholder="_ _,_ _" autocomplete="off" data-answer="74.3" data-tol="0.5" data-label="Total remise HT" style="width:115px">
+      </div>
+      <div class="total-row">
+        <span class="t-label">Total net HT</span>
+        <input class="inp" id="q8" type="text" placeholder="_ ___,__" autocomplete="off" data-answer="4046.7" data-tol="0.5" data-label="Total net HT" style="width:115px">
+      </div>
+      <div class="total-row">
+        <span class="t-label">TVA 20 %</span>
+        <input class="inp" id="q9" type="text" placeholder="_ _ _,__" autocomplete="off" data-answer="809.34" data-tol="0.6" data-label="TVA 20 %" style="width:115px">
+      </div>
+      <div class="total-row ttc">
+        <span class="t-label">Total TTC</span>
+        <input class="inp" id="q10" type="text" placeholder="_ ___,__" autocomplete="off" data-answer="4856.04" data-tol="0.6" data-label="Total TTC" style="width:115px;font-size:15px;font-weight:700">
+      </div>
+    </div>
+  </div>
+
+  <div class="facture-footer">
+    <span>TERRATEC Ingénierie SAS – Capital 10 000 €</span>
+    <span class="siret">SIRET 452 879 301 00027 – TVA FR 45 452879301</span>
+    <span>Page 1/1</span>
+  </div>
+
+</div>
+
+<button class="btn-check" id="btn-verif" onclick="verifierTout()">&#9658; Vérifier ma facture</button>
+
+<div class="score-card" id="score-card">
+  <div class="score-label">Résultat</div>
+  <div class="big-score" id="big-score">0 / 10</div>
+  <div class="score-msg" id="score-msg"></div>
+</div>
+
+<div class="detail-card" id="detail-card">
+  <h3>Détail case par case</h3>
+  <div id="detail-contenu"></div>
+</div>
+
+<script>
+(function() {
+  var TOTAL = 10;
+
+  function parseVal(str) {
+    if (!str || str.trim() === '') return NaN;
+    return parseFloat(str.trim().replace(/\s/g, '').replace(',', '.'));
+  }
+
+  function updateProgress() {
+    var ok = 0;
+    var inputs = document.querySelectorAll('.inp[data-answer]');
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].classList.contains('correct')) ok++;
+    }
+    document.getElementById('prog-text').textContent = ok + ' / ' + TOTAL + ' cases correctes';
+    document.getElementById('prog-fill').style.width = (ok / TOTAL * 100) + '%';
+    return ok;
+  }
+
+  function checkField(inp) {
+    var val = parseVal(inp.value);
+    var ans = parseFloat(inp.getAttribute('data-answer'));
+    var tol = parseFloat(inp.getAttribute('data-tol') || '0.5');
+    if (isNaN(val)) {
+      inp.classList.remove('correct', 'wrong');
+      return null;
+    }
+    var ok = Math.abs(val - ans) <= tol;
+    inp.classList.remove('correct', 'wrong');
+    if (ok) {
+      inp.classList.add('correct');
+    } else {
+      inp.classList.add('wrong');
+      setTimeout(function() { inp.classList.remove('wrong'); }, 500);
+    }
+    updateProgress();
+    return ok;
+  }
+
+  var inputs = document.querySelectorAll('.inp[data-answer]');
+  for (var i = 0; i < inputs.length; i++) {
+    (function(inp) {
+      inp.addEventListener('blur', function() { checkField(inp); });
+      inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') inp.blur(); });
+    })(inputs[i]);
+  }
+
+  window.verifierTout = function() {
+    var ok = 0;
+    var rows = [];
+    var inputs = document.querySelectorAll('.inp[data-answer]');
+
+    for (var i = 0; i < inputs.length; i++) {
+      var inp = inputs[i];
+      var res = checkField(inp);
+      var label = inp.getAttribute('data-label') || inp.id;
+      var saisi = inp.value.trim() === '' ? '(vide)' : inp.value.trim();
+      if (res === true) ok++;
+      rows.push({ label: label, ok: res, saisi: saisi });
+    }
+
+    // Afficher score
+    var card = document.getElementById('score-card');
+    var bigScore = document.getElementById('big-score');
+    var msg = document.getElementById('score-msg');
+    card.classList.add('visible');
+    bigScore.textContent = ok + ' / ' + TOTAL;
+    bigScore.className = 'big-score';
+
+    if (ok === TOTAL) {
+      bigScore.classList.add('good');
+      msg.textContent = 'Excellent ! Toutes vos cases sont correctes. Facture validée.';
+    } else if (ok >= 7) {
+      bigScore.classList.add('medium');
+      msg.textContent = 'Bon travail ! Quelques cases à revoir – relisez vos calculs sur le brouillon.';
+    } else {
+      bigScore.classList.add('bad');
+      msg.textContent = 'Plusieurs erreurs. Reprenez méthodiquement depuis les totaux bruts.';
+    }
+
+    // Afficher détail
+    var detailCard = document.getElementById('detail-card');
+    var contenu = document.getElementById('detail-contenu');
+    detailCard.classList.add('visible');
+    contenu.innerHTML = '';
+
+    for (var j = 0; j < rows.length; j++) {
+      var r = rows[j];
+      var div = document.createElement('div');
+      div.className = 'detail-row';
+
+      var nom = document.createElement('span');
+      nom.className = 'detail-nom';
+      nom.textContent = r.label;
+
+      var saisiSpan = document.createElement('span');
+      saisiSpan.className = 'detail-saisi';
+      saisiSpan.textContent = r.saisi;
+
+      var statut = document.createElement('span');
+      if (r.ok === true) {
+        statut.className = 'detail-ok';
+        statut.textContent = 'CORRECT';
+      } else if (r.ok === false) {
+        statut.className = 'detail-err';
+        statut.textContent = 'INCORRECT';
+      } else {
+        statut.className = 'detail-vide';
+        statut.textContent = 'VIDE';
+      }
+
+      div.appendChild(nom);
+      div.appendChild(saisiSpan);
+      div.appendChild(statut);
+      contenu.appendChild(div);
+    }
+
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    updateProgress();
+  };
+})();
+</script>
+</body>
+</html>
